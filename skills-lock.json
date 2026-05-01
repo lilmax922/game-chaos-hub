@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "skills": {
+    "cheerio-parsing": {
+      "source": "mindrally/skills",
+      "sourceType": "github",
+      "skillPath": "cheerio-parsing/SKILL.md",
+      "computedHash": "7e8ef130e2e0dd9b75410d2825de9ba3a4f527f2cd724533f48836aa7ec65bde"
+    },
+    "messaging-api": {
+      "source": "abgne/line-dev",
+      "sourceType": "github",
+      "skillPath": "skills/messaging-api/SKILL.md",
+      "computedHash": "64524be8fec5857de20be03caa1b27a966f1445eb242eb71cae72225c037ed3d"
+    },
+    "nodejs-express-server": {
+      "source": "aj-geddes/useful-ai-prompts",
+      "sourceType": "github",
+      "skillPath": "skills/nodejs-express-server/SKILL.md",
+      "computedHash": "94af4eda308df6d27b94cc866de0d3d857755c91da01808d3d8130d91ebaf231"
+    }
+  }
+}
