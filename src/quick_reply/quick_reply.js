@@ -1,33 +1,15 @@
-export default {
+const createQuickReply = (prefix) => ({
   type: 'text',
-  text: '選擇想看的最新看板吧!',
+  text: '選擇喜歡的看板吧!',
   quickReply: {
     items: [
       {
         type: 'action',
-        imageUrl: 'https://raw.githubusercontent.com/lilmax922/Photos/main/icons/new-tag.png',
+        imageUrl: 'https://raw.githubusercontent.com/lilmax922/Photos/main/icons/fire.png',
         action: {
           type: 'message',
-          label: '最新',
-          text: '最新'
-        }
-      },
-      {
-        type: 'action',
-        imageUrl: 'https://raw.githubusercontent.com/lilmax922/Photos/main/icons/gossip.png',
-        action: {
-          type: 'message',
-          label: '八卦新聞',
-          text: '!最新 八卦'
-        }
-      },
-      {
-        type: 'action',
-        imageUrl: 'https://raw.githubusercontent.com/lilmax922/Photos/main/icons/funny.png',
-        action: {
-          type: 'message',
-          label: '休閒娛樂',
-          text: '!最新 娛樂'
+          label: '全部',
+          text: `${prefix} 全部`
         }
       },
       {
@@ -36,7 +18,25 @@ export default {
         action: {
           type: 'message',
           label: '英雄聯盟',
-          text: '!最新 英雄聯盟'
+          text: `${prefix} 英雄聯盟`
+        }
+      },
+      {
+        type: 'action',
+        imageUrl: 'https://raw.githubusercontent.com/lilmax922/Photos/main/icons/gossip.png',
+        action: {
+          type: 'message',
+          label: '八卦新聞',
+          text: `${prefix} 八卦`
+        }
+      },
+      {
+        type: 'action',
+        imageUrl: 'https://raw.githubusercontent.com/lilmax922/Photos/main/icons/funny.png',
+        action: {
+          type: 'message',
+          label: '休閒娛樂',
+          text: `${prefix} 娛樂`
         }
       },
       {
@@ -45,7 +45,7 @@ export default {
         action: {
           type: 'message',
           label: '爐石戰記',
-          text: '!最新 爐石戰記'
+          text: `${prefix} 爐石戰記`
         }
       },
       {
@@ -54,7 +54,7 @@ export default {
         action: {
           type: 'message',
           label: '寶可夢',
-          text: '!最新 寶可夢'
+          text: `${prefix} 寶可夢`
         }
       },
       {
@@ -63,16 +63,16 @@ export default {
         action: {
           type: 'message',
           label: 'Apex英雄',
-          text: '!最新 apex英雄'
+          text: `${prefix} apex英雄`
         }
       },
       {
         type: 'action',
-        imageUrl: 'https://raw.githubusercontent.com/lilmax922/Photos/main/icons/NSFW.png',
+        imageUrl: 'https://raw.githubusercontent.com/lilmax922/Photos/main/icons/games.png',
         action: {
           type: 'message',
-          label: '福利',
-          text: '!最新 福利'
+          label: '綜合遊戲',
+          text: `${prefix} 遊戲`
         }
       },
       {
@@ -81,7 +81,7 @@ export default {
         action: {
           type: 'message',
           label: '寵物',
-          text: '!最新 寵物'
+          text: `${prefix} 寵物`
         }
       },
       {
@@ -90,7 +90,7 @@ export default {
         action: {
           type: 'message',
           label: '動漫',
-          text: '!最新 動漫'
+          text: `${prefix} 動漫`
         }
       },
       {
@@ -99,7 +99,7 @@ export default {
         action: {
           type: 'message',
           label: '電影',
-          text: '!最新 電影'
+          text: `${prefix} 電影`
         }
       },
       {
@@ -108,18 +108,14 @@ export default {
         action: {
           type: 'message',
           label: '迷因',
-          text: '!最新 迷因'
-        }
-      },
-      {
-        type: 'action',
-        imageUrl: 'https://raw.githubusercontent.com/lilmax922/Photos/main/icons/games.png',
-        action: {
-          type: 'message',
-          label: '綜合遊戲討論',
-          text: '!最新 遊戲'
+          text: `${prefix} 迷因`
         }
       }
     ]
   }
-}
+})
+
+export const quickReplyHot = createQuickReply('!熱門')
+export const quickReplyNew = createQuickReply('!最新')
+
+export default { quickReplyHot, quickReplyNew }

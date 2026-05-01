@@ -1,44 +1,72 @@
-// 引用 dotenv 讀取 .env 檔的設定
 import 'dotenv/config'
-// 引用 linebot
 import linebot from 'linebot'
 import express from 'express'
-// 網站
-import hotArticle from './commands/hot_article.js'
-import newArticle from './commands/new_article.js'
-import goldenArticle from './commands/golden_article.js'
-import commentArticle from './commands/comment_article.js'
-import search from './commands/search.js'
-// 快速選單 JSON
-import quickReplyHot from './quick_reply/quick_reply_hot.js'
-import quickReplyNew from './quick_reply/quick_reply_new.js'
-import quickReplyGolden from './quick_reply/quick_reply_golden.js'
-import quickReplyComment from './quick_reply/quick_reply_comment.js'
-import axios from 'axios'
-
-// 改 axios 的預設值
-axios.defaults.headers['Accept-Encoding'] = 'text/html'
+import handleArticle from './src/commands/article.js'
+import handleSearch from './src/commands/search.js'
+import { quickReplyHot, quickReplyNew } from './src/quick_reply/quick_reply.js'
 
 const app = express()
 
-// 設定 linebot
 const bot = linebot({
   channelId: process.env.CHANNEL_ID,
   channelSecret: process.env.CHANNEL_SECRET,
   channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN
 })
 
-bot.on('message', event => {
-  if (event.message.text === '熱門看板') event.reply(quickReplyHot)
-  else if (event.message.text === '最新看板') event.reply(quickReplyNew)
-  else if (event.message.text === '含金文章') event.reply(quickReplyGolden)
-  else if (event.message.text === '最多討論') event.reply(quickReplyComment)
+const BOARD_NAMES = new Set([
+  'lol', 'gaming', 'apexleagues', 'pokemon', 'overwatch', 'steam', 'TFT',
+  'yugioh', 'hs', 'lolm', 'valorant', 'moba', 'gta', 'PUBG', 'csgo',
+  'mobileGame', 'hotchick', 'gossiping', 'funny', 'movie', 'pet',
+  'acg', '3c', 'sport', 'meme',
+  '英雄聯盟', '遊戲', 'apex英雄', '寶可夢', '鬥陣特工', 'steam',
+  '聯盟戰旗', '遊戲王', '爐石戰記', '激鬥峽谷', '特戰英豪', '傳說對決',
+  '俠盜獵車手', '絕地求生', 'csgo', '手遊', '福利', '八卦', '娛樂',
+  '電影', '寵物', '動漫', '3c', '運動', '迷因'
+])
 
-  if (event.message.text.includes('!最新') || event.message.text.includes('!new')) newArticle(event)
-  else if (event.message.text.includes('!含金') || event.message.text.includes('!golden')) goldenArticle(event)
-  else if (event.message.text.includes('!討論') || event.message.text.includes('!comment')) commentArticle(event)
-  else if (event.message.text.includes('!熱門') || event.message.text.includes('!hot') || event.message.text.includes('熱門') || event.message.text.includes('最新')) hotArticle(event)
-  else search(event)
+bot.on('message', event => {
+  const text = event.message.text
+
+  if (text === '熱門文章') {
+    event.reply(quickReplyHot)
+    return
+  }
+  if (text === '最新文章') {
+    event.reply(quickReplyNew)
+    return
+  }
+
+  const lowerText = text.toLowerCase().trim()
+
+  if (lowerText === '全部') {
+    handleArticle(event)
+    return
+  }
+
+  if (BOARD_NAMES.has(text)) {
+    handleArticle(event)
+    return
+  }
+
+  if (lowerText === '!熱門' || lowerText === '!hot') {
+    handleArticle(event)
+    return
+  }
+  if (lowerText === '!最新' || lowerText === '!new') {
+    handleArticle(event)
+    return
+  }
+
+  if (lowerText.startsWith('!熱門 ') || lowerText.startsWith('!hot ')) {
+    handleArticle(event)
+    return
+  }
+  if (lowerText.startsWith('!最新 ') || lowerText.startsWith('!new ')) {
+    handleArticle(event)
+    return
+  }
+
+  handleSearch(event)
 })
 
 const linebotParser = bot.parser()
@@ -49,7 +77,6 @@ app.get('/', (request, response) => {
   response.status(200).send('ok')
 })
 
-// linebot 偵測指定 port 的請求
 app.listen(process.env.PORT || 3000, () => {
   console.log('機器人啟動')
 })
