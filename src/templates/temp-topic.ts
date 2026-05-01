@@ -1,11 +1,36 @@
-export default {
+export interface FlexBubble {
+  type: 'bubble'
+  hero: {
+    type: 'image'
+    url: string
+    size: string
+    aspectRatio: string
+    aspectMode: string
+  }
+  body: {
+    type: 'box'
+    layout: string
+    contents: unknown[]
+    backgroundColor?: string
+  }
+  footer: {
+    type: 'box'
+    layout: string
+    spacing: string
+    contents: unknown[]
+    flex?: number
+    backgroundColor?: string
+  }
+}
+
+export const tempTopic: FlexBubble = {
   type: 'bubble',
   hero: {
     type: 'image',
     url: 'https://scdn.line-apps.com/n/channel_devcenter/img/fx/01_1_cafe.png',
     size: 'full',
     aspectRatio: '20:13',
-    aspectMode: 'cover'
+    aspectMode: 'cover',
   },
   body: {
     type: 'box',
@@ -15,7 +40,7 @@ export default {
         type: 'text',
         text: 'Brown Cafe',
         weight: 'bold',
-        size: 'xl'
+        size: 'xl',
       },
       {
         type: 'box',
@@ -32,8 +57,8 @@ export default {
                 text: '實況精華',
                 size: 'sm',
                 color: '#eeeeee',
-                weight: 'bold'
-              }
+                weight: 'bold',
+              },
             ],
             backgroundColor: '#C48486',
             width: '80px',
@@ -47,8 +72,8 @@ export default {
               type: 'linearGradient',
               angle: '145deg',
               startColor: '#C48555',
-              endColor: '#C48486'
-            }
+              endColor: '#C48486',
+            },
           },
           {
             type: 'box',
@@ -60,7 +85,7 @@ export default {
                 color: '#666666',
                 size: 'sm',
                 align: 'start',
-                text: '多久前發表在'
+                text: '多久前發表在',
               },
               {
                 type: 'text',
@@ -68,13 +93,13 @@ export default {
                 color: '#ce706c',
                 size: 'md',
                 align: 'start',
-                weight: 'bold'
-              }
+                weight: 'bold',
+              },
             ],
-            paddingTop: '8px'
-          }
+            paddingTop: '8px',
+          },
         ],
-        offsetTop: '-5px'
+        offsetTop: '-5px',
       },
       {
         type: 'box',
@@ -87,13 +112,13 @@ export default {
             wrap: false,
             weight: 'bold',
             decoration: 'underline',
-            style: 'italic'
-          }
+            style: 'italic',
+          },
         ],
-        paddingTop: '5px'
-      }
+        paddingTop: '5px',
+      },
     ],
-    backgroundColor: '#ffeeef'
+    backgroundColor: '#ffeeef',
   },
   footer: {
     type: 'box',
@@ -107,12 +132,14 @@ export default {
         action: {
           type: 'uri',
           label: '看內文去',
-          uri: 'https://linecorp.com'
+          uri: 'https://linecorp.com',
         },
-        color: '#CE8086'
-      }
+        color: '#CE8086',
+      },
     ],
     flex: 0,
-    backgroundColor: '#EFE3D8'
-  }
+    backgroundColor: '#EFE3D8',
+  },
 }
+
+export default tempTopic

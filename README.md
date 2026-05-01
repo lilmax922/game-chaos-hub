@@ -1,8 +1,8 @@
 # LineBot-遊戲大亂源
 
 
-### 安安！<br>
-### 遊戲大亂源 為您提供了討論度最熱門的Twitch 遊戲實況直播、遊戲影片、電競遊戲新聞以及各類遊戲閒聊。
+## 安安！<br>
+## 遊戲大亂源 為您提供了討論度最熱門的Twitch 遊戲實況直播、遊戲影片、電競遊戲新聞以及各類遊戲閒聊。
 ### Line ID:@368uzwcl<br>
 ![image](https://github.com/lilmax922/LineBot-BestGamingForum/blob/master/line-add.png)<br>
 
