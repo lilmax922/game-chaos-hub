@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express'
+import * as line from '@line/bot-sdk'
 import express from 'express'
-import linebot from 'linebot'
 import { handleArticle } from './commands/article.js'
 import { handleSearch } from './commands/search.js'
 import { quickReplyHot, quickReplyNew } from './quick-reply/quick-reply.js'
@@ -8,10 +8,12 @@ import 'dotenv/config'
 
 const app = express()
 
-const bot = linebot({
-  channelId: process.env.CHANNEL_ID ?? '',
-  channelSecret: process.env.CHANNEL_SECRET ?? '',
+const client = line.LineBotClient.fromChannelAccessToken({
   channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN ?? '',
+})
+
+const lineMiddleware = line.middleware({
+  channelSecret: process.env.CHANNEL_SECRET ?? '',
 })
 
 const BOARD_NAMES = new Set([
@@ -67,64 +69,141 @@ const BOARD_NAMES = new Set([
   '迷因',
 ])
 
-interface LineMessageEvent {
-  type: string
-  message: {
-    type: string
-    id: string
-    text?: string
+type WebhookEvent = line.webhook.Event
+
+async function processEvent(event: WebhookEvent): Promise<void> {
+  if (event.type === 'message') {
+    const msgEvent = event as line.webhook.MessageEvent
+    if (msgEvent.message.type === 'text') {
+      await handleTextMessage(msgEvent)
+    }
   }
-  reply: (message: unknown) => Promise<unknown>
+  else if (event.type === 'postback') {
+    const postbackEvent = event as line.webhook.PostbackEvent
+    await handlePostback(postbackEvent)
+  }
 }
 
-bot.on('message', async (event: LineMessageEvent) => {
-  const text = event.message.text ?? ''
+async function handleTextMessage(event: line.webhook.MessageEvent): Promise<void> {
+  const message = event.message
+  const text = message.type === 'text' ? message.text : ''
 
   if (text === '熱門文章') {
-    await event.reply(quickReplyHot)
+    await client.replyMessage({
+      replyToken: event.replyToken!,
+      messages: [quickReplyHot],
+    })
     return
   }
   if (text === '最新文章') {
-    await event.reply(quickReplyNew)
+    await client.replyMessage({
+      replyToken: event.replyToken!,
+      messages: [quickReplyNew],
+    })
     return
   }
 
   const lowerText = text.toLowerCase().trim()
 
   if (lowerText === '全部') {
-    await handleArticle(event)
+    await handleArticle(client, event.replyToken!, text)
     return
   }
 
   if (BOARD_NAMES.has(text)) {
-    await handleArticle(event)
+    await handleArticle(client, event.replyToken!, text)
     return
   }
 
   if (lowerText === '!熱門' || lowerText === '!hot') {
-    await handleArticle(event)
+    await handleArticle(client, event.replyToken!, text)
     return
   }
   if (lowerText === '!最新' || lowerText === '!new') {
-    await handleArticle(event)
+    await handleArticle(client, event.replyToken!, text)
     return
   }
 
   if (lowerText.startsWith('!熱門 ') || lowerText.startsWith('!hot ')) {
-    await handleArticle(event)
+    await handleArticle(client, event.replyToken!, text)
     return
   }
   if (lowerText.startsWith('!最新 ') || lowerText.startsWith('!new ')) {
-    await handleArticle(event)
+    await handleArticle(client, event.replyToken!, text)
     return
   }
 
-  await handleSearch(event)
+  await handleSearch(client, event.replyToken!, text)
+}
+
+async function handlePostback(event: line.webhook.PostbackEvent): Promise<void> {
+  const data = event.postback.data
+
+  if (data === '熱門文章') {
+    await client.replyMessage({
+      replyToken: event.replyToken!,
+      messages: [quickReplyHot],
+    })
+    return
+  }
+  if (data === '最新文章') {
+    await client.replyMessage({
+      replyToken: event.replyToken!,
+      messages: [quickReplyNew],
+    })
+    return
+  }
+
+  const text = data ?? ''
+  const lowerText = text.toLowerCase().trim()
+
+  if (lowerText === '全部') {
+    await handleArticle(client, event.replyToken!, text)
+    return
+  }
+
+  if (BOARD_NAMES.has(text)) {
+    await handleArticle(client, event.replyToken!, text)
+    return
+  }
+
+  if (lowerText === '!熱門' || lowerText === '!hot') {
+    await handleArticle(client, event.replyToken!, text)
+    return
+  }
+  if (lowerText === '!最新' || lowerText === '!new') {
+    await handleArticle(client, event.replyToken!, text)
+    return
+  }
+
+  if (lowerText.startsWith('!熱門 ') || lowerText.startsWith('!hot ')) {
+    await handleArticle(client, event.replyToken!, text)
+    return
+  }
+  if (lowerText.startsWith('!最新 ') || lowerText.startsWith('!new ')) {
+    await handleArticle(client, event.replyToken!, text)
+    return
+  }
+
+  await handleSearch(client, event.replyToken!, text)
+}
+
+app.post('/', lineMiddleware, async (req: Request, res: Response) => {
+  const events = req.body.events as WebhookEvent[] | undefined
+  if (!events || events.length === 0) {
+    res.status(200).send('ok')
+    return
+  }
+
+  try {
+    await Promise.all(events.map(processEvent))
+    res.status(200).json({ success: true })
+  }
+  catch (err) {
+    console.error('Error handling events:', err)
+    res.status(500).json({ error: 'Internal server error' })
+  }
 })
-
-const linebotParser = bot.parser()
-
-app.post('/', linebotParser)
 
 app.get('/', (_request: Request, response: Response) => {
   response.status(200).send('ok')

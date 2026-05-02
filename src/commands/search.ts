@@ -1,3 +1,4 @@
+import type { LineBotClient } from '@line/bot-sdk'
 import { formatTimestamp, getArticleUrl, search } from '../services/league-funny-api.js'
 import tempTopic from '../templates/temp-topic.js'
 import writeJson from '../utils/write-json.js'
@@ -41,24 +42,26 @@ function buildBubble(article: Article): typeof tempTopic {
   return bubble
 }
 
-interface LineEvent {
-  message: { text?: string }
-  reply: (message: unknown) => Promise<unknown>
-}
-
 interface SearchResult {
   data?: Article[]
   total?: number
 }
 
-export async function handleSearch(event: LineEvent): Promise<void> {
+export async function handleSearch(
+  client: LineBotClient,
+  replyToken: string,
+  text: string,
+): Promise<void> {
   try {
-    const keyword = (event.message.text ?? '').trim()
+    const keyword = (text ?? '').trim()
 
     console.log(`[Command] handleSearch | input="${keyword}"`)
 
     if (keyword.length < 2) {
-      await event.reply('請輸入有效的搜尋關鍵字（至少2個字）')
+      await client.replyMessage({
+        replyToken,
+        messages: [{ type: 'text', text: '請輸入有效的搜尋關鍵字（至少2個字）' }],
+      })
       return
     }
 
@@ -68,7 +71,10 @@ export async function handleSearch(event: LineEvent): Promise<void> {
     const total = result.total || 0
 
     if (articles.length === 0) {
-      await event.reply(`找不到「${keyword}」相關文章`)
+      await client.replyMessage({
+        replyToken,
+        messages: [{ type: 'text', text: `找不到「${keyword}」相關文章` }],
+      })
       return
     }
 
@@ -87,20 +93,26 @@ export async function handleSearch(event: LineEvent): Promise<void> {
     }
 
     const reply = {
-      type: 'flex',
+      type: 'flex' as const,
       altText: `搜尋「${keyword}」找到 ${total} 篇文章`,
       contents: {
-        type: 'carousel',
+        type: 'carousel' as const,
         contents: bubbles,
       },
     }
 
-    await event.reply(reply)
+    await client.replyMessage({
+      replyToken,
+      messages: [reply as any],
+    })
     writeJson(reply, 'debug_search')
   }
   catch (error) {
     console.error('handleSearch error:', error)
-    await event.reply('搜尋失敗，請稍後再試')
+    await client.replyMessage({
+      replyToken,
+      messages: [{ type: 'text', text: '搜尋失敗，請稍後再試' }],
+    })
   }
 }
 

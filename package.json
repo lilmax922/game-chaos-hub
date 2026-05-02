@@ -2,6 +2,7 @@
   "name": "linebot",
   "type": "module",
   "version": "1.0.0",
+  "packageManager": "pnpm@10.21.0",
   "description": "LINE Bot for game community articles",
   "author": "",
   "license": "ISC",
@@ -19,11 +20,11 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@line/bot-sdk": "^11.0.0",
     "axios": "^1.15.2",
     "cloudscraper": "^4.6.0",
     "dotenv": "^17.4.2",
-    "express": "^5.2.1",
-    "linebot": "^1.6.1"
+    "express": "^5.2.1"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^8.2.0",

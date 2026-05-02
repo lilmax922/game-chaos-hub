@@ -1,3 +1,4 @@
+import type { LineBotClient } from '@line/bot-sdk'
 import { fetchFeed, formatTimestamp, getArticleUrl } from '../services/league-funny-api.js'
 import tempTopic from '../templates/temp-topic.js'
 import writeJson from '../utils/write-json.js'
@@ -61,6 +62,7 @@ function parseCommand(text: string): ParsedCommand | null {
   if (lowerText === '全部')
     return { board: null, sort: 'hot' }
 
+  // eslint-disable-next-line regexp/no-super-linear-backtracking, regexp/no-useless-non-capturing-group
   const combinedMatch = text.match(/^!(熱門|最新|hot|new)\s+(.+)$/i)
   if (combinedMatch) {
     const sortWord = combinedMatch[1]
@@ -130,14 +132,12 @@ function buildBubble(article: Article, board: BoardType | null): typeof tempTopi
   return bubble
 }
 
-interface LineEvent {
-  message: { text?: string }
-  reply: (message: unknown) => Promise<unknown>
-}
-
-export async function handleArticle(event: LineEvent): Promise<void> {
+export async function handleArticle(
+  client: LineBotClient,
+  replyToken: string,
+  text: string,
+): Promise<void> {
   try {
-    const text = event.message.text ?? ''
     const parsed = parseCommand(text)
     if (!parsed)
       return
@@ -168,25 +168,34 @@ export async function handleArticle(event: LineEvent): Promise<void> {
     }
 
     const reply = {
-      type: 'flex',
+      type: 'flex' as const,
       altText: '遊戲圈時事文章',
       contents: {
-        type: 'carousel',
+        type: 'carousel' as const,
         contents: bubbles,
       },
     }
 
     if (bubbles.length === 0) {
-      await event.reply('查無此類型文章')
+      await client.replyMessage({
+        replyToken,
+        messages: [{ type: 'text', text: '查無此類型文章' }],
+      })
     }
     else {
-      await event.reply(reply)
+      await client.replyMessage({
+        replyToken,
+        messages: [reply as any],
+      })
       writeJson(reply, 'debug_articles')
     }
   }
   catch (error) {
     console.error('handleArticle error:', error)
-    await event.reply('取得文章失敗，請稍後再試')
+    await client.replyMessage({
+      replyToken,
+      messages: [{ type: 'text', text: '取得文章失敗，請稍後再試' }],
+    })
   }
 }
 
