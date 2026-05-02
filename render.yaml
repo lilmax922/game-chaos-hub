@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: linebot-bestgamingforum
+    name: game-chaos-hub
     env: node
     buildCommand: pnpm install --include=dev && pnpm build
     startCommand: node dist/index.js
