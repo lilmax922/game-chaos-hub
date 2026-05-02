@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: linebot-bestgamingforum
+    env: node
+    buildCommand: pnpm install --include=dev && pnpm build
+    startCommand: node dist/index.js
+    healthCheckPath: /
+    plan: free
+    region: singapore
