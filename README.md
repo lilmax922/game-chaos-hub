@@ -46,7 +46,7 @@ Line ID: @368uzwcl
 - **語言**: TypeScript
 - **框架**: Express.js
 - **LINE SDK**: @line/bot-sdk
-- **爬蟲**: cloudscraper
+- **資料獲取**: Reverse Engineer API
 - **套件管理**: pnpm
 
 ## 快速開始

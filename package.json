@@ -23,7 +23,6 @@
     "@line/bot-sdk": "^11.0.0",
     "@types/express": "^5.0.6",
     "@types/node": "^25.6.0",
-    "axios": "^1.15.2",
     "cloudscraper": "^4.6.0",
     "dotenv": "^17.4.2",
     "express": "^5.2.1"
